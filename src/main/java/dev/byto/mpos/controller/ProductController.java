@@ -19,7 +19,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<Page<Product>> getAllProducts(Pageable pageable) {
+    public ResponseEntity<ApiResponse<Page<Product>>> getAllProducts(Pageable pageable) {
         Page<Product> products = productService.getAllProducts(pageable);
         ApiResponse<Page<Product>> response = new ApiResponse<>("SUCCESS", "Products retrieved successfully", products);
         return ResponseEntity.ok(response);
