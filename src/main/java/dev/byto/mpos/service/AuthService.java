@@ -1,5 +1,8 @@
 package dev.byto.mpos.service;
 
+import dev.byto.mpos.dto.AuthRequest;
+import dev.byto.mpos.dto.AuthResponse;
+import dev.byto.mpos.dto.RegisterRequest;
 import dev.byto.mpos.entity.User;
 import dev.byto.mpos.repository.UserRepository;
 import dev.byto.mpos.security.JwtService;

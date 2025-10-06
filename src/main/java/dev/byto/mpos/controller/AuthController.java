@@ -1,5 +1,9 @@
 package dev.byto.mpos.controller;
 
+import dev.byto.mpos.dto.AuthRequest;
+import dev.byto.mpos.dto.AuthResponse;
+import dev.byto.mpos.dto.RegisterRequest;
+import dev.byto.mpos.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
