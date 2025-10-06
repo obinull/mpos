@@ -1,5 +1,6 @@
 package dev.byto.mpos.controller;
 
+import dev.byto.mpos.dto.ApiResponse;
 import dev.byto.mpos.dto.ProductDto;
 import dev.byto.mpos.entity.Product;
 import dev.byto.mpos.service.ProductService;
@@ -19,35 +20,53 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(Pageable pageable) {
-        return ResponseEntity.ok(productService.getAllProducts(pageable));
+        Page<Product> products = productService.getAllProducts(pageable);
+        ApiResponse<Page<Product>> response = new ApiResponse<>("SUCCESS", "Products retrieved successfully", products);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<?>> getProductById(@PathVariable Long id) {
         return productService.getProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(product -> {
+                    ApiResponse<Product> response = new ApiResponse<>("SUCCESS", "Product found successfully", product);
+                    return new ResponseEntity<ApiResponse<?>>(response, HttpStatus.OK);
+                })
+                .orElseGet(() -> {
+                    ApiResponse<Object> response = new ApiResponse<>("FAILED", "Product with id " + id + " not found.", null);
+                    return new ResponseEntity<ApiResponse<?>>(response, HttpStatus.NOT_FOUND);
+                });
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductDto productDto) {
+    public ResponseEntity<ApiResponse<Product>> createProduct(@RequestBody ProductDto productDto) {
         Product createdProduct = productService.createProduct(productDto);
-        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+        ApiResponse<Product> response = new ApiResponse<>("SUCCESS", "Product created successfully", createdProduct);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
+    public ResponseEntity<ApiResponse<?>> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
         return productService.updateProduct(id, productDto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(product -> {
+                    ApiResponse<Product> response = new ApiResponse<>("SUCCESS", "Product updated successfully", product);
+                    return new ResponseEntity<ApiResponse<?>>(response, HttpStatus.OK);
+                })
+                .orElseGet(() -> {
+                    ApiResponse<Object> response = new ApiResponse<>("FAILED", "Product with id " + id + " not found for update.", null);
+                    return new ResponseEntity<ApiResponse<?>>(response, HttpStatus.NOT_FOUND);
+                });
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        if (productService.deleteProduct(id)) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<ApiResponse<Object>> deleteProduct(@PathVariable Long id) {
+        boolean isDeleted = productService.deleteProduct(id);
+        if (isDeleted) {
+            ApiResponse<Object> response = new ApiResponse<>("SUCCESS", "Product with id " + id + " deleted successfully.", null);
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.notFound().build();
+            ApiResponse<Object> response = new ApiResponse<>("FAILED", "Product with id " + id + " not found for deletion.", null);
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
 }

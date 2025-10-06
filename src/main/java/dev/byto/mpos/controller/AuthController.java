@@ -1,5 +1,6 @@
 package dev.byto.mpos.controller;
 
+import dev.byto.mpos.dto.ApiResponse;
 import dev.byto.mpos.dto.AuthRequest;
 import dev.byto.mpos.dto.AuthResponse;
 import dev.byto.mpos.dto.RegisterRequest;
@@ -20,11 +21,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+        AuthResponse authResponse = authService.register(request);
+        ApiResponse<AuthResponse> response = new ApiResponse<>("SUCCESS", "User registered successfully", authResponse);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+        AuthResponse authResponse = authService.login(request);
+        ApiResponse<AuthResponse> response = new ApiResponse<>("SUCCESS", "Login successful", authResponse);
+        return ResponseEntity.ok(response);
     }
 }
